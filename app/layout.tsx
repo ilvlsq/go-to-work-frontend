@@ -3,14 +3,9 @@ import localFont from "next/font/local";
 import "@/styles/globals.css";
 import Navbar from "@/components/layout/Header";
 
-const geistSans = localFont({
-  src: "../public/fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../public/fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+const montserrat = localFont({
+  src: "../public/fonts/Montserrat-VariableFont_wght.ttf",
+  variable: "--font-montserrat",
   weight: "100 900",
 });
 
@@ -26,11 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${montserrat.variable} antialiased`}>
         <Navbar />
-        {children}
+        <main className="pt-12">{children}</main>
       </body>
     </html>
   );

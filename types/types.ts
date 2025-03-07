@@ -1,25 +1,97 @@
-export interface Company {
-    id: string;
-    name: string;
-    logo: string | null;
-  }
+export interface CompanyBase {
+  id: number;
+  name: string;
+  companyLogo: string;
+}
 
-export interface Job {
-    id: string;
-    title: string;
-    company: Company;
-    location: string;
-    shortDescription: string;
-    fullDescription: string;
-    salary: {
-      min: number;
-      max: number;
-      currency: string;
-    };
-    postedDate: string; 
-    employmentType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'TEMPORARY' | 'INTERNSHIP';
-    experienceLevel: 'ENTRY' | 'INTERMEDIATE' | 'SENIOR' | 'EXECUTIVE';
-    tags: string[];
-    requirements: string[];
-    applicationUrl: string;
-  }
+export interface Company {
+  id: number;
+  name: string;
+  businessStreamName: string;
+  companyLogo: string;
+  companyDescription: string;
+  establishmentDate: Date;
+  companyWebsiteUrl: string;
+  companyImages: string[];
+}
+
+export interface JobGradation {
+  id: number;
+  gradation: string;
+}
+
+export interface JobType {
+  id: number;
+  type: string;
+}
+
+export interface JobPost {
+  id: number;
+  company: CompanyBase;
+  type: JobType;
+  gradation: JobGradation;
+  title: string;
+  jobDescription: string;
+  jobLocation: string;
+  latitude: number;
+  longitude: number;
+  isCompanyNameHidden: boolean;
+  createdAt: Date;
+  isActive: boolean;
+}
+
+export interface CompanyWithPosts {
+  id: number;
+  name: string;
+  companyLogo: string;
+  jobPosts: JobPost[];
+}
+
+export interface CompanyAllInfoResponse {
+  id: number;
+  name: string;
+  businessStreamName: string;
+  companyLogo: string;
+  companyDescription: string;
+  establishmentDate: Date;
+  companyWebsiteUrl: string;
+  companyImages: string[];
+}
+
+export interface CompanyBaseResponse {
+  id: number;
+  name: string;
+  companyLogo: string;
+}
+
+export interface CompanyWithPostsResponse {
+  id: number;
+  name: string;
+  companyLogo: string;
+  jobPostIds: number[];
+}
+
+export interface JobGradationBaseResponse {
+  id: number;
+  gradation: string;
+}
+
+export interface JobTypeBaseResponse {
+  id: number;
+  type: string;
+}
+
+export interface JobPostBaseResponse {
+  id: number;
+  company: CompanyBaseResponse;
+  type: JobTypeBaseResponse;
+  gradation: JobGradationBaseResponse;
+  title: string;
+  jobDescription: string;
+  jobLocation: string;
+  latitude: number;
+  longitude: number;
+  isCompanyNameHidden: boolean;
+  createdAt: Date;
+  isActive: boolean;
+}

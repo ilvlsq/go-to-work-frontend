@@ -8,13 +8,13 @@ export default function CompanyLogo({
   companyTitle: string;
 }) {
   return (
-    <div className="relative w-16 h-16 mr-4 overflow-hidden rounded-full">
+    <div className="relative min-w-20 min-h-20 mr-4 overflow-hidden rounded-full border-4 border-slate-200">
       <Image
         src={companyLogo || `/placeholder.svg?height=64&width=64`}
         alt={`${companyTitle} logo`}
         fill
         className="object-cover"
-        sizes="64px"
+        sizes="100px"
       />
     </div>
   );
