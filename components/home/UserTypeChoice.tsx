@@ -6,7 +6,7 @@ export default function UserTypeChoice() {
     <section className="bg-secondary">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="grid md:grid-cols-2 divide-x-2 divide-gray-300">
-          {/* Соискатель */}
+          {/* seeker */}
           <div className="p-4 sm:p-6 flex flex-col min-h-[400px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">Ви шукаєте роботу?</h2>
             <div className="h-px bg-gray-300 w-full mb-2"></div>
@@ -39,7 +39,7 @@ export default function UserTypeChoice() {
             </div>
           </div>
 
-          {/* Работодатель */}
+          {/* employer */}
           <div className="p-4 sm:p-6 flex flex-col min-h-[400px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">Ви роботодавець?</h2>
             <div className="h-px bg-gray-300 w-full mb-2"></div>

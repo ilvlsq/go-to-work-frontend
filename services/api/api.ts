@@ -60,8 +60,8 @@ export async function getJobs(): Promise<JobPostBaseResponse[]> {
 {
     id: 2,
     company: {
-      id: 2,
-      name: "Company 2",
+      id: 1,
+      name: "Company 1",
       companyLogo: "https://static.vecteezy.com/system/resources/thumbnails/012/986/755/small/abstract-circle-logo-icon-free-png.png",
     },
     type: {
@@ -78,6 +78,30 @@ export async function getJobs(): Promise<JobPostBaseResponse[]> {
     latitude: 2,
     longitude: 2,
     isCompanyNameHidden: true,
+    createdAt: new Date(),
+    isActive: true,
+  },
+  {
+    id: 3,
+    company: {
+      id: 3,
+      name: "Company 3",
+      companyLogo: "https://static.vecteezy.com/system/resources/thumbnails/012/986/755/small/abstract-circle-logo-icon-free-png.png",
+    },
+    type: {
+      id: 3,
+      type: "Full-Time",
+    },
+    gradation: {
+      id: 3,
+      gradation: "Senior",
+    },
+    title: "Job 3",
+    jobDescription: "Job 3 description",
+    jobLocation: "Job 3 location",
+    latitude: 3,
+    longitude: 3,
+    isCompanyNameHidden: false,
     createdAt: new Date(),
     isActive: true,
   },
