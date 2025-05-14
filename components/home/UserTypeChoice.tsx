@@ -27,7 +27,7 @@ export default function UserTypeChoice() {
               
               <div className="md:w-1/2 flex flex-col">
                 <p className="text-gray-600 text-base text-left">
-                  Давайте обговоримо ваші наступні кар'єрні можливості та почнемо роботу над вашою заявкою!
+                  Давайте обговоримо ваші наступні кар&apos;єрні можливості та почнемо роботу над вашою заявкою!
                 </p>
               </div>
             </div>

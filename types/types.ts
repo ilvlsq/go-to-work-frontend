@@ -15,6 +15,58 @@ export interface Company {
   companyImages: string[];
 }
 
+export interface CompanyCreateRequest {
+  name: string;
+  businessStreamName: string;
+  companyLogo: string;
+  companyDescription: string;
+  establishmentDate: Date;
+  companyWebsiteUrl: string;
+  companyImages: string[];
+}
+
+export interface CompanyUpdateRequest {
+  name?: string;
+  businessStreamName?: string;
+  companyLogo?: string;
+  companyDescription?: string;
+  establishmentDate?: Date;
+  companyWebsiteUrl?: string;
+  companyImages?: string[];
+}
+
+export interface PaginatedCompanyResponse {
+  content: Company[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+export interface CompanyBaseResponse {
+  id: number;
+  name: string;
+  companyLogo: string;
+}
+
+export interface CompanyAllInfoResponse {
+  id: number;
+  name: string;
+  businessStreamName: string;
+  companyLogo: string;
+  companyDescription: string;
+  establishmentDate: Date;
+  companyWebsiteUrl: string;
+  companyImages: string[];
+}
+
+export interface CompanyWithPostsResponse {
+  id: number;
+  name: string;
+  companyLogo: string;
+  jobPostIds: number[];
+}
+
 export interface JobGradation {
   id: number;
   gradation: string;
@@ -45,30 +97,6 @@ export interface CompanyWithPosts {
   name: string;
   companyLogo: string;
   jobPosts: JobPost[];
-}
-
-export interface CompanyAllInfoResponse {
-  id: number;
-  name: string;
-  businessStreamName: string;
-  companyLogo: string;
-  companyDescription: string;
-  establishmentDate: Date;
-  companyWebsiteUrl: string;
-  companyImages: string[];
-}
-
-export interface CompanyBaseResponse {
-  id: number;
-  name: string;
-  companyLogo: string;
-}
-
-export interface CompanyWithPostsResponse {
-  id: number;
-  name: string;
-  companyLogo: string;
-  jobPostIds: number[];
 }
 
 export interface JobGradationBaseResponse {

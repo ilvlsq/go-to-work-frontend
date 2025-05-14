@@ -1,7 +1,30 @@
+'use client';
 import Link from "next/link";
 import Image from "next/image";
+import { useUser } from '@/context/UserContext';
+import { useEffect, useState } from 'react';
+import HeaderSkeleton from '@/components/ui/HeaderSkeleton';
+import { getCurrentUser } from '@/services/api/api';
 
-export default function Navbar() {
+export default function Header() {
+  const { user, setUser } = useUser();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (user === null) {
+      getCurrentUser()
+        .then(setUser)
+        .catch(() => setUser(null));
+    }
+    console.log(user);
+  }, [user, setUser]);
+
+  if (!hydrated) return <HeaderSkeleton />;
+
   return (
     <header className="fixed bg-white p-3 z-10 top-0 left-0 right-0">
       <div className="container mx-auto flex justify-between items-center">
@@ -13,12 +36,7 @@ export default function Navbar() {
             height={41}
           />
         </Link>
-        <nav className="flex space-x-4">
-          <Link href={"/"} className="group relative">
-            <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
-              Головна
-            </span>
-          </Link>
+        <nav className="flex items-center space-x-6">
           <Link href={"/"} className="group relative">
             <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
               Вакансії
@@ -26,9 +44,31 @@ export default function Navbar() {
           </Link>
           <Link href={"/"} className="group relative">
             <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
-              Профіль
+              Для роботодавців
             </span>
           </Link>
+          <div className="flex items-center space-x-6">
+            {user ? (
+              <Link href="/profile" className="group relative">
+                <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
+                  Профіль
+                </span>
+              </Link>
+            ) : (
+              <>
+                <Link href="/auth/login" className="group relative">
+                  <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
+                    Увійти
+                  </span>
+                </Link>
+                <Link href="/auth/register" className="group relative">
+                  <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
+                    Реєстрація
+                  </span>
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
       </div>
     </header>
