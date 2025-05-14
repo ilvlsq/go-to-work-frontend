@@ -1,7 +1,6 @@
 import { JobPost } from "@/types/types";
 import CompanyLogo from "./CompanyLogo";
 import Link from "next/link";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react";
 
 export default function JobInfo({ job }: { job: JobPost }) {
   return (
