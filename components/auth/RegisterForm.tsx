@@ -48,7 +48,7 @@ export default function RegisterForm() {
     }
     setLoading(true);
     try {
-      let payload: any;
+      let payload: unknown;
       if (userType === 'SEEKER') {
         payload = {
           user: {
