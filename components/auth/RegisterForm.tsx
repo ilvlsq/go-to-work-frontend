@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { registerUser } from '@/services/api/api';
 import { Input } from '@/components/ui/Input';
+import { registerSchema } from '@/validation/registerSchema';
 
 const USER_TYPES = [
   { value: 'SEEKER ', label: 'Я шукаю роботу' },
@@ -32,9 +33,9 @@ export default function RegisterForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -42,20 +43,30 @@ export default function RegisterForm() {
     e.preventDefault();
     setError(null);
     setSuccess(false);
-    if (formData.password !== formData.confirmPassword) {
-      setError('Паролі не співпадають');
+
+    try {
+      await registerSchema.validate(formData, { abortEarly: false });
+    } catch (validationError) {
+      if (validationError instanceof Error && 'errors' in validationError) {
+        // @ts-ignore
+        setError(validationError.errors[0]);
+      } else {
+        setError('Сталася помилка валідації');
+      }
       return;
     }
+
     setLoading(true);
     try {
+      const userPayload = {
+        email: formData.email,
+        contactNumber: formData.contactNumber,
+        password: formData.password,
+      };
       let payload: unknown;
       if (userType === 'SEEKER') {
         payload = {
-          user: {
-            email: formData.email,
-            contactNumber: formData.contactNumber,
-            password: formData.password,
-          },
+          user: userPayload,
           seeker: {
             firstName: formData.firstName,
             lastName: formData.lastName,
@@ -63,11 +74,7 @@ export default function RegisterForm() {
         };
       } else {
         payload = {
-          user: {
-            email: formData.email,
-            contactNumber: formData.contactNumber,
-            password: formData.password,
-          },
+          user: userPayload,
           company: {
             name: formData.companyName,
             businessStreamName: formData.companyDirection,
@@ -97,18 +104,18 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white py-8">
-      <div className="w-full max-w-lg bg-secondary rounded-2xl shadow-xl p-8 flex flex-col items-center">
+    <div className="flex min-h-screen items-center justify-center bg-white py-8">
+      <div className="flex w-full max-w-lg flex-col items-center rounded-2xl bg-secondary p-8 shadow-xl">
         {/* select user type */}
-        <div className="flex w-full justify-center gap-4 mb-8">
-          {USER_TYPES.map(type => (
+        <div className="mb-8 flex w-full justify-center gap-4">
+          {USER_TYPES.map((type) => (
             <label
               key={type.value}
-              className={`px-6 py-2 rounded-full cursor-pointer border text-base font-semibold shadow-sm transition-all duration-200
-                ${userType === type.value
-                  ? 'bg-white border-gray-400 text-gray-700 shadow-md'
-                  : 'bg-gray-100 border-gray-300 text-gray-500'}
-              `}
+              className={`cursor-pointer rounded-full border px-6 py-2 text-base font-semibold shadow-sm transition-all duration-200 ${
+                userType === type.value
+                  ? 'border-gray-400 bg-white text-gray-700 shadow-md'
+                  : 'border-gray-300 bg-gray-100 text-gray-500'
+              } `}
             >
               <input
                 type="radio"
@@ -122,11 +129,13 @@ export default function RegisterForm() {
             </label>
           ))}
         </div>
-        <h1 className="text-3xl font-bold text-center mb-2">Register</h1>
-        <p className="text-center mb-6 text-lg">Створіть обліковий запис</p>
-        {error && <div className="text-red-600 text-center mb-2 w-full">{error}</div>}
-        {success && <div className="text-green-600 text-center mb-2 w-full">Реєстрація успішна!</div>}
-        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+        <h1 className="mb-2 text-center text-3xl font-bold">Register</h1>
+        <p className="mb-6 text-center text-lg">Створіть обліковий запис</p>
+        {error && <div className="mb-2 w-full text-center text-red-600">{error}</div>}
+        {success && (
+          <div className="mb-2 w-full text-center text-green-600">Реєстрація успішна!</div>
+        )}
+        <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             id="email"
             name="email"
@@ -219,7 +228,7 @@ export default function RegisterForm() {
                 name="companyDescription"
                 required
                 rows={3}
-                className="block w-full rounded-2xl px-6 py-3 bg-gray-50 border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#38b48e] text-base placeholder-gray-400 resize-none placeholder:text-sm"
+                className="block w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-6 py-3 text-base placeholder-gray-400 shadow-sm placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-[#38b48e]"
                 placeholder="Короткий опис компанії"
                 value={formData.companyDescription}
                 onChange={handleChange}
@@ -244,12 +253,50 @@ export default function RegisterForm() {
               type="button"
               tabIndex={-1}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
-              onClick={() => setShowPassword(v => !v)}
+              onClick={() => setShowPassword((v) => !v)}
             >
               {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.223-3.592m3.1-2.727A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.293 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.223-3.592m3.1-2.727A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.293 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3l18 18"
+                  />
+                </svg>
               )}
             </button>
           </div>
@@ -270,28 +317,68 @@ export default function RegisterForm() {
               type="button"
               tabIndex={-1}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
-              onClick={() => setShowPassword(v => !v)}
+              onClick={() => setShowPassword((v) => !v)}
             >
               {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.223-3.592m3.1-2.727A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.293 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.223-3.592m3.1-2.727A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.973 9.973 0 01-4.293 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3l18 18"
+                  />
+                </svg>
               )}
             </button>
           </div>
           <button
             type="submit"
-            className="w-full rounded-full bg-white text-gray-700 font-bold text-lg py-3 shadow-md hover:bg-gray-100 transition"
+            className="w-full rounded-full bg-white py-3 text-lg font-bold text-gray-700 shadow-md transition hover:bg-gray-100"
             style={{ boxShadow: '0 4px 16px 0 rgba(0,0,0,0.08)' }}
             disabled={loading}
           >
             {loading ? 'Реєстрація...' : 'Створити'}
           </button>
         </form>
-        <div className="text-center mt-4 text-base w-full">
-          <a href="/auth/login" className="underline text-black hover:text-gray-600">У мене вже є акаунт</a>
+        <div className="mt-4 w-full text-center text-base">
+          <a href="/auth/login" className="text-black underline hover:text-gray-600">
+            У мене вже є акаунт
+          </a>
         </div>
       </div>
     </div>
   );
-} 
+}

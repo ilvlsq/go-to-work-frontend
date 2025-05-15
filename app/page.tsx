@@ -1,13 +1,13 @@
-import Hero from "@/components/home/Hero";
-import CitySearch from "@/components/home/CitySearch";
-import ResumeCreator from "@/components/home/ResumeCreator";
-import RecommendetJobs from "@/components/home/RecommendetJobs";
-import UserTypeChoice from "@/components/home/UserTypeChoice";
-import NewsInsights from "@/components/home/NewsInsights";
-import Footer from "@/components/layout/Footer";
+import Hero from '@/components/home/Hero';
+import CitySearch from '@/components/home/CitySearch';
+import ResumeCreator from '@/components/home/ResumeCreator';
+import RecommendetJobs from '@/components/home/RecommendetJobs';
+import UserTypeChoice from '@/components/home/UserTypeChoice';
+import NewsInsights from '@/components/home/NewsInsights';
+import Footer from '@/components/layout/Footer';
 
 export default async function Home() {
-//const jobs: JobPostBaseResponse[] = await getJobs();
+  //const jobs: JobPostBaseResponse[] = await getJobs();
 
   return (
     <>

@@ -24,7 +24,7 @@ export default function ForgotPasswordForm() {
           type="email"
           autoComplete="email"
           required
-          className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+          className="focus:ring-primary focus:border-primary relative block w-full appearance-none rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
           placeholder="Email адреса"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -34,17 +34,17 @@ export default function ForgotPasswordForm() {
       <div>
         <button
           type="submit"
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          className="bg-primary hover:bg-primary-dark focus:ring-primary group relative flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2"
         >
           Надіслати інструкції
         </button>
       </div>
 
-      <div className="text-sm text-center">
-        <Link href="/auth/login" className="font-medium text-primary hover:text-primary-dark">
+      <div className="text-center text-sm">
+        <Link href="/auth/login" className="text-primary hover:text-primary-dark font-medium">
           Повернутися до входу
         </Link>
       </div>
     </form>
   );
-} 
+}
