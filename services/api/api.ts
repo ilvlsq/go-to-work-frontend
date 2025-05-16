@@ -166,7 +166,11 @@ export async function getAllCompaniesWithPosts(): Promise<CompanyWithPosts[]> {
 
 // User registration
 export async function registerUser(data: any): Promise<any> {
-  return post('auth/register', data);
+  const response = await post<{ token: string }>('auth/register', data);
+  if (response.token) {
+    localStorage.setItem('authToken', response.token);
+  }
+  return response;
 }
 
 // User login

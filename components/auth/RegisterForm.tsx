@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { registerUser } from '@/services/api/api';
+import { getCurrentUser, registerUser } from '@/services/api/api';
 import { Input } from '@/components/ui/Input';
-import { registerSchema } from '@/validation/registerSchema';
+import { seekerRegisterSchema, companyRegisterSchema } from '@/validation/registerSchema';
+import { ZodError } from 'zod';
+import { useRouter } from 'next/navigation';
 
 const USER_TYPES = [
-  { value: 'SEEKER ', label: 'Я шукаю роботу' },
+  { value: 'SEEKER', label: 'Я шукаю роботу' },
   { value: 'COMPANY', label: 'Я компанія' },
 ];
 
@@ -45,51 +47,58 @@ export default function RegisterForm() {
     setSuccess(false);
 
     try {
-      await registerSchema.validate(formData, { abortEarly: false });
-    } catch (validationError) {
-      if (validationError instanceof Error && 'errors' in validationError) {
-        // @ts-ignore
-        setError(validationError.errors[0]);
+      if (userType === 'SEEKER') {
+        await seekerRegisterSchema.parseAsync(formData);
       } else {
-        setError('Сталася помилка валідації');
+        await companyRegisterSchema.parseAsync(formData);
       }
+    } catch (validationError) {
+      if (validationError instanceof ZodError) {
+        setError(validationError.errors[0].message);
+        return;
+      }
+      setError('Помилка валідації даних');
       return;
     }
 
     setLoading(true);
-    try {
-      const userPayload = {
-        email: formData.email,
-        contactNumber: formData.contactNumber,
-        password: formData.password,
+    const userPayload = {
+      email: formData.email,
+      contactNumber: formData.contactNumber,
+      password: formData.password,
+    };
+    let payload: unknown;
+    if (userType === 'SEEKER') {
+      payload = {
+        user: userPayload,
+        seeker: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        },
       };
-      let payload: unknown;
-      if (userType === 'SEEKER') {
-        payload = {
-          user: userPayload,
-          seeker: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-          },
-        };
-      } else {
-        payload = {
-          user: userPayload,
-          company: {
-            name: formData.companyName,
-            businessStreamName: formData.companyDirection,
-            companyDescription: formData.companyDescription,
-          },
-        };
+    } else {
+      payload = {
+        user: userPayload,
+        company: {
+          name: formData.companyName,
+          businessStreamName: formData.companyDirection,
+          companyDescription: formData.companyDescription,
+          establishmentDate: formData.companyFoundation,
+        },
+      };
+    }
+    try {
+      const response = await registerUser(payload);
+      if (response?.token) {
+        getCurrentUser();
+        setSuccess(true);
       }
-      await registerUser(payload);
-      setSuccess(true);
     } catch (err: unknown) {
       let message = 'Сталася помилка';
       const error = err as Error & { status?: number };
       switch (error.status) {
         case 409:
-          message = 'Не вдалося створити акаунт. Перевірте дані або спробуйте пізніше.';
+          message = 'Не вдалося створити акаунт. Спробуйте інший email або спробуйте пізніше.';
           break;
         case 500:
           message = 'Сервер тимчасово недоступний, спробуйте пізніше';
@@ -122,7 +131,7 @@ export default function RegisterForm() {
                 name="userType"
                 value={type.value}
                 checked={userType === type.value}
-                onChange={() => setUserType(type.value)}
+                onChange={(e) => setUserType(e.target.value)}
                 className="sr-only"
               />
               {type.label}
@@ -169,16 +178,6 @@ export default function RegisterForm() {
                 onChange={handleChange}
                 disabled={loading}
               />
-              <Input
-                id="contactNumber"
-                name="contactNumber"
-                type="tel"
-                required
-                placeholder="Контактний номер"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                disabled={loading}
-              />
             </>
           )}
           {userType === 'COMPANY' && (
@@ -213,20 +212,9 @@ export default function RegisterForm() {
                 onChange={handleChange}
                 disabled={loading}
               />
-              <Input
-                id="contactNumber"
-                name="contactNumber"
-                type="tel"
-                required
-                placeholder="Контактний номер"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                disabled={loading}
-              />
               <textarea
                 id="companyDescription"
                 name="companyDescription"
-                required
                 rows={3}
                 className="block w-full resize-none rounded-2xl border border-gray-200 bg-gray-50 px-6 py-3 text-base placeholder-gray-400 shadow-sm placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-[#38b48e]"
                 placeholder="Короткий опис компанії"
@@ -236,6 +224,16 @@ export default function RegisterForm() {
               />
             </>
           )}
+          <Input
+            id="contactNumber"
+            name="contactNumber"
+            type="tel"
+            required
+            placeholder="Контактний номер"
+            value={formData.contactNumber}
+            onChange={handleChange}
+            disabled={loading}
+          />
           <div className="relative">
             <Input
               id="password"
