@@ -1,0 +1,15 @@
+svg path {
+  transition:
+    fill 0.25s ease-in-out,
+    stroke 0.25s ease-in-out,
+    stroke-width 0.25s ease-in-out,
+    filter 0.25s ease-in-out;
+}
+
+svg path:hover {
+  cursor: pointer;
+  fill: #d0f0f3;
+  stroke: #ffffff;
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}

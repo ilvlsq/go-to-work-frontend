@@ -1,7 +1,7 @@
-import {  CompanyWithPosts, JobPostBaseResponse } from "@/types/types";
+import { CompanyWithPosts, JobPostBaseResponse } from '@/types/types';
 import { getAuthToken } from '@/utils/auth';
 
-const API_BASE_URL = "http://15.237.184.213:8082/api/";
+const API_BASE_URL = 'http://15.237.184.213:8082/api/';
 
 function handleApiError(response: Response, data?: any) {
   let message = 'Сталася помилка';
@@ -37,7 +37,7 @@ async function get<T>(endpoint: string): Promise<T> {
   const headers: HeadersInit = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: "GET",
+    method: 'GET',
     headers,
   });
   let data;
@@ -52,10 +52,10 @@ async function get<T>(endpoint: string): Promise<T> {
 
 async function post<T>(endpoint: string, data: any): Promise<T> {
   const token = getAuthToken();
-  const headers: HeadersInit = { "Content-Type": "application/json" };
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: "POST",
+    method: 'POST',
     headers,
     body: JSON.stringify(data),
   });
@@ -71,10 +71,10 @@ async function post<T>(endpoint: string, data: any): Promise<T> {
 
 async function put<T>(endpoint: string, data: any): Promise<T> {
   const token = getAuthToken();
-  const headers: HeadersInit = { "Content-Type": "application/json" };
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: "PUT",
+    method: 'PUT',
     headers,
     body: JSON.stringify(data),
   });
@@ -93,7 +93,7 @@ async function del<T>(endpoint: string): Promise<T> {
   const headers: HeadersInit = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers,
   });
   let respData;
@@ -107,7 +107,7 @@ async function del<T>(endpoint: string): Promise<T> {
 }
 
 export async function getJobs(): Promise<JobPostBaseResponse[]> {
-  return get<JobPostBaseResponse[]>("/jobs");
+  return get<JobPostBaseResponse[]>('/jobs');
 }
 
 export async function getJob(id: string): Promise<JobPostBaseResponse | null> {
@@ -115,7 +115,12 @@ export async function getJob(id: string): Promise<JobPostBaseResponse | null> {
 }
 
 // Companies
-export async function getCompanies(params?: { search?: string; businessStream?: string; page?: number; size?: number }) {
+export async function getCompanies(params?: {
+  search?: string;
+  businessStream?: string;
+  page?: number;
+  size?: number;
+}) {
   const queryParams = new URLSearchParams();
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -161,7 +166,11 @@ export async function getAllCompaniesWithPosts(): Promise<CompanyWithPosts[]> {
 
 // User registration
 export async function registerUser(data: any): Promise<any> {
-  return post('auth/register', data);
+  const response = await post<{ token: string }>('auth/register', data);
+  if (response.token) {
+    localStorage.setItem('authToken', response.token);
+  }
+  return response;
 }
 
 // User login
