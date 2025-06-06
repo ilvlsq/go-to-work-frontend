@@ -19,7 +19,9 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (user) {
-      //router.replace('/profile');
+      setTimeout(() => {
+        router.replace('/');
+      }, 500);
     }
   }, [user, router]);
 

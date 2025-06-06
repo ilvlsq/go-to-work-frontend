@@ -8,7 +8,7 @@ export default function CompanyLogo({
   companyTitle: string;
 }) {
   return (
-    <div className="relative mr-4 min-h-20 min-w-20 overflow-hidden rounded-full border-4 border-slate-200">
+    <div className="relative h-12 w-12 overflow-hidden rounded-full border-0 border-slate-200 transition-all duration-100 hover:cursor-pointer hover:border-2">
       <Image
         src={companyLogo || `/placeholder.svg?height=64&width=64`}
         alt={`${companyTitle} logo`}

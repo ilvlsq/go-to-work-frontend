@@ -1,15 +1,11 @@
-import { JobPostBaseResponse } from '@/types/types';
+import { getRecommendetJobs } from '@/services/api/api';
+import { RecommendetJobsType } from '@/types/types';
 import CompanyJobs from '../jobs/CompanyJobs';
 
-interface GroupedJobs {
-  [key: string]: {
-    company: JobPostBaseResponse['company'];
-    jobs: JobPostBaseResponse[];
-  };
-}
+export default async function RecommendetJobs() {
+  const recommendetJobs = await getRecommendetJobs();
 
-export default async function RecommendetJobs({ jobs }: { jobs: JobPostBaseResponse[] }) {
-  if (!jobs || jobs.length === 0) {
+  if (!recommendetJobs || recommendetJobs.length === 0) {
     return (
       <section className="container mx-auto px-4 py-8">
         <h1 className="mb-9 text-center text-4xl font-bold">Оберіть роботу вашої мрії!</h1>
@@ -38,57 +34,15 @@ export default async function RecommendetJobs({ jobs }: { jobs: JobPostBaseRespo
     );
   }
 
-  try {
-    const groupedJobs = jobs.reduce((acc, job) => {
-      const companyId = job.company.id;
-      if (!acc[companyId]) {
-        acc[companyId] = {
-          company: job.company,
-          jobs: [],
-        };
-      }
-      acc[companyId].jobs.push(job);
-      return acc;
-    }, {} as GroupedJobs);
-
-    return (
-      <section className="container mx-auto px-4 py-8">
-        <h1 className="mb-9 text-center text-4xl font-bold">Оберіть роботу вашої мрії!</h1>
-        <div className="space-y-12">
-          {Object.values(groupedJobs).map(({ company, jobs }) => (
-            <CompanyJobs key={company.id} company={company} jobs={jobs} />
-          ))}
-          <div className="border-t"></div>
-        </div>
-      </section>
-    );
-  } catch (error) {
-    console.error('Error rendering jobs:', error);
-    return (
-      <section className="container mx-auto px-4 py-8">
-        <h1 className="mb-9 text-center text-4xl font-bold">Оберіть роботу вашої мрії!</h1>
-        <div className="py-12 text-center">
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-            <svg
-              className="h-8 w-8 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-xl font-semibold text-gray-700">
-            Виникла помилка при завантаженні вакансій
-          </h2>
-          <p className="text-gray-500">Будь ласка, спробуйте оновити сторінку</p>
-        </div>
-      </section>
-    );
-  }
+  return (
+    <section className="container mx-auto px-4 py-8">
+      <h1 className="mb-9 text-center text-4xl font-bold">Оберіть роботу вашої мрії!</h1>
+      <div className="space-y-12">
+        {recommendetJobs.map((recommendetJob: RecommendetJobsType) => (
+          <CompanyJobs key={recommendetJob.id} recommendetJob={recommendetJob} />
+        ))}
+        <div className="border-t"></div>
+      </div>
+    </section>
+  );
 }

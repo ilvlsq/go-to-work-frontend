@@ -32,7 +32,7 @@ export default function Header() {
           <Image src={'/images/logo_1 1.png'} alt="DevFusion Logo" width={147} height={41} />
         </Link>
         <nav className="flex items-center space-x-6">
-          <Link href={'/'} className="group relative">
+          <Link href={'/vacancies'} className="group relative">
             <span className="relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-gray-700 after:transition-all after:duration-300 group-hover:after:w-full">
               Вакансії
             </span>
