@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Button from '@/components/ui/Button';
+import ResumeCreatorButton from '../ui/ResumeCreatorButton';
 
 export default function ResumeCreator() {
   return (
@@ -111,9 +111,7 @@ export default function ResumeCreator() {
                   </ul>
                 </div>
 
-                <Button variant="primary" size="medium" className="mt-6">
-                  Створити CV
-                </Button>
+                <ResumeCreatorButton />
               </div>
             </div>
 
