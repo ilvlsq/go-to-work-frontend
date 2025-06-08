@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { FiExternalLink, FiPhone } from 'react-icons/fi';
 import { CompanyCardProps } from '@/types/types';
-import CompanyLogo from '../jobs/CompanyLogo';
+import CompanyLogo from '../ui/CompanyLogo';
+import { toSlug } from '@/utils/toSlug';
 
 interface Props {
   company: CompanyCardProps;
@@ -16,7 +17,11 @@ export default function CompanyCard({ company }: Props) {
       <div className="p-6">
         <div className="mb-2 flex items-center gap-4">
           {company.logo && (
-            <Link href={`/company/${company.id}`} target="_blank" rel="noopener noreferrer">
+            <Link
+              href={`/companies/${toSlug(company.name)}-${company.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <CompanyLogo companyLogo={company.logo} companyTitle={company.name} />
             </Link>
           )}

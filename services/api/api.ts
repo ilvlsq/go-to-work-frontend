@@ -1,5 +1,5 @@
-import { JobPostBaseResponse, JobPostsParams, RecommendetJobsType } from '@/types/types';
-import { getAuthToken } from '@/utils/auth';
+import { Company, JobPostBaseResponse, JobPostsParams, RecommendetJobsType } from '@/types/types';
+import { getAuthToken, clearAuthData } from '@/utils/auth';
 
 const API_BASE_URL = 'http://35.180.166.154:8082/api';
 
@@ -11,6 +11,7 @@ function handleApiError(response: Response, data?: any) {
       break;
     case 401:
       message = data?.message || 'Невірний логін або пароль';
+      clearAuthData();
       break;
     case 403:
       message = data?.message || 'Доступ заборонено';
@@ -99,8 +100,8 @@ export async function getCompanies(params?: {
   return get(endpoint);
 }
 
-export async function getCompanyById(id: number) {
-  return get(`/companies/${id}`);
+export async function getCompanyById(id: string): Promise<Company> {
+  return get(`/v1/companies/${id}`);
 }
 
 export async function registerUser(data: any): Promise<any> {
@@ -133,7 +134,13 @@ export async function getJobPosts(params?: JobPostsParams): Promise<JobPostBaseR
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        queryParams.append(key, String(value));
+        if (key === 'skillIds' && Array.isArray(value)) {
+          value.forEach((skillId) => {
+            queryParams.append('skillIds', String(skillId));
+          });
+        } else {
+          queryParams.append(key, String(value));
+        }
       }
     });
   }

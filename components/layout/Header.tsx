@@ -5,6 +5,7 @@ import { useUser } from '@/context/UserContext';
 import { useEffect, useState } from 'react';
 import HeaderSkeleton from '@/components/ui/HeaderSkeleton';
 import { getCurrentUser } from '@/services/api/api';
+import { ChatButton } from '../chat/ChatButton';
 
 export default function Header() {
   const { user, setUser } = useUser();
@@ -65,6 +66,7 @@ export default function Header() {
             )}
           </div>
         </nav>
+        <ChatButton />
       </div>
     </header>
   );

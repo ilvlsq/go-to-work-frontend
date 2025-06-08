@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { RecommendetJobsType } from '@/types/types';
 import JobCard from './JobCard';
-import CompanyLogo from './CompanyLogo';
+import CompanyLogo from '../ui/CompanyLogo';
+import { toSlug } from '@/utils/toSlug';
 
 export default function CompanyJobs({ recommendetJob }: { recommendetJob: RecommendetJobsType }) {
   return (
@@ -9,7 +10,7 @@ export default function CompanyJobs({ recommendetJob }: { recommendetJob: Recomm
       {/* Company header */}
       <div className="mb-6 flex items-center">
         <Link
-          href={`/companies/${recommendetJob.id}`}
+          href={`/companies/${toSlug(recommendetJob.name)}-${recommendetJob.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center"

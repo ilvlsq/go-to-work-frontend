@@ -1,7 +1,9 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser } from '@/context/UserContext';
 import Button from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
+import { getCurrentUser } from '@/services/api/api';
 
 const mockProfile = {
   fullName: 'Джон Смит',
@@ -39,28 +41,63 @@ const mockProfile = {
 };
 
 export default function UserProfile() {
+  const router = useRouter();
   const { user, setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // fetch('/api/v1/seeker/profile', { headers: { Authorization: `Bearer ${token}` } })
-    //   .then(...)
-  }, [user]);
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          router.push('/');
+          return;
+        }
+
+        await getCurrentUser();
+        setError(null);
+      } catch (err) {
+        setError('Не вдалося завантажити профіль');
+        console.error('Profile fetch error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [router, setUser]);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     setUser(null);
-    window.location.href = '/';
+    router.push('/');
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-lg">Завантаження...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-lg text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto mt-8 flex max-w-2xl flex-col gap-8 rounded-xl bg-white p-8 shadow-md">
       <div className="flex items-center justify-between border-b pb-4">
         <h1 className="text-2xl font-bold">Профіль користувача</h1>
-        <Button onClick={handleLogout} className="bg-red-500 text-white hover:bg-red-600">
+        <Button variant="primary" onClick={handleLogout}>
           Вийти
         </Button>
       </div>
-      {/* Основная информация */}
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <h2 className="mb-2 font-semibold">Особиста інформація</h2>

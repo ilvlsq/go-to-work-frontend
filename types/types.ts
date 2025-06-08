@@ -4,17 +4,6 @@ export interface CompanyBase {
   companyLogo: string;
 }
 
-export interface Company {
-  id: number;
-  name: string;
-  businessStreamName: string;
-  companyLogo: string;
-  companyDescription: string;
-  establishmentDate: Date;
-  companyWebsiteUrl: string;
-  companyImages: string[];
-}
-
 export interface CompanyCreateRequest {
   name: string;
   businessStreamName: string;
@@ -214,10 +203,39 @@ export interface RecommendetJobsType {
 export interface JobPostsParams {
   searchQuery?: string;
   location?: string;
-  jobType?: string;
+  jobType?: number;
   experience?: string;
+  skillIds?: string[];
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';
   page?: number;
   size?: number;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+  example_url?: string;
+}
+
+export interface ChatPayload {
+  messages: {
+    role: 'user' | 'assistant';
+    content: string;
+  }[];
+  include_example: boolean;
+}
+
+export interface Company {
+  id: number;
+  name: string;
+  businessStreamName: string;
+  companyLogo: string;
+  companyDescription: string;
+  companyWebsiteUrl: string;
+  establishmentDate: string;
+  companyImages: string[];
+  email: string;
+  contactNumber: string;
 }

@@ -12,9 +12,23 @@ interface JobPostsApiResponse {
   number: number;
 }
 
+interface Filters {
+  searchQuery?: string;
+  location?: string;
+  jobType?: number;
+  experience?: string;
+  skillIds?: string[];
+}
+
 export default function VacanciesPage() {
   const searchParams = useSearchParams();
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<Filters>({
+    searchQuery: '',
+    location: '',
+    jobType: 0,
+    experience: '',
+    skillIds: [],
+  });
   const [jobs, setJobs] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -27,8 +41,10 @@ export default function VacanciesPage() {
     window.scrollTo({ top: 0, behavior: 'auto' });
     const urlQuery = searchParams.get('query') || '';
     const urlCity = searchParams.get('city') || '';
+
     setInitialQuery(urlQuery);
     setInitialCity(urlCity);
+
     if ((urlQuery || urlCity) && !autoSearched) {
       setIsLoading(true);
       getJobPosts({
@@ -42,7 +58,10 @@ export default function VacanciesPage() {
         .then((res: any) => {
           setJobs(res.content || []);
           setTotalPages(res.totalPages || 1);
-          setFilters({ searchQuery: urlQuery, location: urlCity });
+          setFilters({
+            searchQuery: urlQuery,
+            location: urlCity,
+          });
         })
         .catch(() => {
           setJobs([]);
@@ -56,7 +75,7 @@ export default function VacanciesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  const handleSearch = async (newFilters: any) => {
+  const handleSearch = async (newFilters: Filters) => {
     setIsLoading(true);
     setFilters(newFilters);
     setPage(0);

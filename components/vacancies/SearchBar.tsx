@@ -7,17 +7,26 @@ import MultiAutocompleteInput from '@/components/ui/MultiAutocompleteInput';
 import { FiSearch, FiMapPin, FiCpu, FiTool, FiStar } from 'react-icons/fi';
 import Button from '../ui/Button';
 import { getCities, getExperiences, getTypes, getSkills } from '@/services/autocompleteService';
-import { getJobPosts } from '@/services/api/api';
+
+interface Option {
+  id: string | number;
+  label: string;
+}
+
+interface Experience {
+  id: number;
+  experience: string;
+}
 
 interface SearchBarProps {
   initialQuery?: string;
   initialCity?: string;
   onSearch?: (filters: {
-    searchQuery: string;
-    location: string;
-    jobType: string;
-    experience: string;
-    skills: string[];
+    searchQuery?: string;
+    location?: string;
+    jobType?: number;
+    experience?: string;
+    skillIds?: string[];
   }) => void;
 }
 
@@ -29,13 +38,13 @@ export default function SearchBar({
   const [query, setQuery] = useState(initialQuery);
   const [city, setCity] = useState(initialCity);
   const [experience, setExperience] = useState('');
-  const [type, setType] = useState('');
-  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
+  const [type, setType] = useState<number>();
+  const [selectedSkills, setSelectedSkills] = useState<Option[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [cities, setCities] = useState<string[]>([]);
-  const [experiences, setExperiences] = useState<any[]>([]);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
   const [types, setTypes] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
 
@@ -52,15 +61,24 @@ export default function SearchBar({
   }, []);
 
   const handleSearch = () => {
-    if (onSearch) {
-      onSearch({
-        searchQuery: query,
-        location: city,
-        jobType: type,
-        experience: experience,
-        skills: selectedSkills.map((s) => s.label),
-      });
-    }
+    if (!onSearch) return;
+
+    const params = {
+      searchQuery: query || undefined,
+      location: city || undefined,
+      jobType: type || undefined,
+      experience: experience || undefined,
+      skillIds: selectedSkills.length > 0 ? selectedSkills.map((s) => String(s.id)) : undefined,
+    };
+
+    // Удаляем все undefined значения
+    Object.keys(params).forEach((key) => {
+      if (params[key as keyof typeof params] === undefined) {
+        delete params[key as keyof typeof params];
+      }
+    });
+
+    onSearch(params);
   };
 
   return (
@@ -125,16 +143,22 @@ export default function SearchBar({
         >
           <AutocompleteInput
             options={experiences.map((e) => e.experience)}
-            value={experience}
-            onChange={setExperience}
+            value={experiences.find((e) => String(e.id) === experience)?.experience || ''}
+            onChange={(value) => {
+              const exp = experiences.find((e) => e.experience === value);
+              setExperience(exp ? String(exp.id) : '');
+            }}
             icon={<FiStar />}
             placeholder="Досвід"
             className="mb-2"
           />
           <AutocompleteInput
             options={types.map((t) => t.name)}
-            value={type}
-            onChange={setType}
+            value={types.find((t) => Number(t.id) === type)?.name || ''}
+            onChange={(value) => {
+              const type = types.find((t) => t.name === value);
+              setType(type ? Number(type.id) : 0);
+            }}
             icon={<FiCpu />}
             placeholder="Тип"
             className="mb-2"

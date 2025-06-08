@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { toSlug } from '@/utils/toSlug';
-import CompanyLogo from '@/components/jobs/CompanyLogo';
+import CompanyLogo from '@/components/ui/CompanyLogo';
 
 interface JobCardProps {
   id: number;
@@ -15,7 +15,7 @@ interface JobCardProps {
   };
   salaryRange?: string;
   language?: string;
-  date?: string;
+  createdAt?: string;
 }
 
 export default function JobCard({
@@ -27,17 +27,25 @@ export default function JobCard({
   company,
   salaryRange,
   language,
-  date,
+  createdAt,
 }: JobCardProps) {
   const showLanguage = language && language !== 'NaN';
   const vacancyUrl = `/vacancy/${toSlug(titleEn || title)}-${id}`;
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('uk-UA', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
 
   return (
     <div className="flex flex-col rounded-2xl bg-white p-6 shadow-md transition hover:shadow-lg">
       <div className="mb-3 flex items-center">
         <div className="mr-4 flex-shrink-0">
           <Link
-            href={`/company/${toSlug(company.name)}-${company.id}`}
+            href={`/companies/${toSlug(company.name)}-${company.id}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -91,8 +99,10 @@ export default function JobCard({
             {language}
           </span>
         )}
-        {date && <span className="ml-auto text-xs text-gray-400">{date}</span>}
       </div>
+      {createdAt && (
+        <span className="mr-auto mt-2 text-xs text-gray-400">{formatDate(createdAt)}</span>
+      )}
     </div>
   );
 }
