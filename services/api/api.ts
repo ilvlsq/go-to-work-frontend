@@ -1,7 +1,7 @@
 import { Company, JobPostBaseResponse, JobPostsParams, RecommendetJobsType } from '@/types/types';
 import { getAuthToken, clearAuthData } from '@/utils/auth';
 
-const API_BASE_URL = 'https://35.180.134.138:8082/api';
+const API_BASE_URL = 'http://35.180.134.138:8082/api';
 
 function handleApiError(response: Response, data?: any) {
   let message = 'Сталася помилка';
