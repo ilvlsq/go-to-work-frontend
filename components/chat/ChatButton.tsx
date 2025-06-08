@@ -9,7 +9,7 @@ export const ChatButton = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { user } = useUser();
 
-  if (!user) {
+  if (false) {
     return null;
   }
 
