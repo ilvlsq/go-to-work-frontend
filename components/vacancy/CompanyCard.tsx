@@ -27,7 +27,7 @@ export default function CompanyCard({ company }: Props) {
           )}
           <div>
             <Link
-              href={`/company/${company.id}`}
+              href={`/companies/${toSlug(company.name)}-${company.id}`}
               className="text-lg font-bold uppercase text-black underline-offset-4 transition hover:underline"
               target="_blank"
               rel="noopener noreferrer"
@@ -53,7 +53,7 @@ export default function CompanyCard({ company }: Props) {
         <div className="line-clamp-3 text-sm text-gray-700">
           {company.description}
           <Link
-            href={`/company/${company.id}`}
+            href={`/companies/${toSlug(company.name)}-${company.id}`}
             className="text-primary hover:text-primary-dark ml-1 inline-flex items-center gap-1 underline"
             target="_blank"
             rel="noopener noreferrer"
