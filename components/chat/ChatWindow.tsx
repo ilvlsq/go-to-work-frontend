@@ -22,6 +22,11 @@ const CHAT_STORAGE_KEY = 'chat_messages';
 const MAX_CONTEXT_MESSAGES = 6;
 const LONG_MESSAGE_THRESHOLD = 450;
 
+const cleanUnformattedAsterisks = (content: string) => {
+  // Заменяем одиночные звездочки, которые не являются частью форматирования
+  return content.replace(/(?<!\*)\*(?!\*)/g, '');
+};
+
 export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindowProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -204,6 +209,9 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                       rehypePlugins={[rehypeRaw, rehypeSanitize]}
                       components={{
                         code({ node, inline, className, children, ...props }: any) {
+                          const content = Array.isArray(children)
+                            ? children.join('')
+                            : String(children);
                           return (
                             <code
                               className={`${className} ${
@@ -213,7 +221,7 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                               }`}
                               {...props}
                             >
-                              {children}
+                              {content}
                             </code>
                           );
                         },
@@ -271,9 +279,12 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                           );
                         },
                         p({ node, children, ...props }) {
+                          const content = Array.isArray(children)
+                            ? children.join('')
+                            : String(children);
                           return (
                             <p className="mb-2" {...props}>
-                              {children}
+                              {cleanUnformattedAsterisks(content)}
                             </p>
                           );
                         },
