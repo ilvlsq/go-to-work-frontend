@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
+import SeekerButton from '../ui/SeekerButton';
 
 export default function UserTypeChoice() {
   return (
@@ -34,9 +35,7 @@ export default function UserTypeChoice() {
             </div>
 
             <div className="mt-auto flex justify-end">
-              <Button variant="primary" size="medium">
-                Завантажити CV
-              </Button>
+              <SeekerButton />
             </div>
           </div>
 

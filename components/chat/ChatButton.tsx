@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChatWindow } from './ChatWindow';
 import { useUser } from '@/context/UserContext';
+import { RiRobot2Line } from 'react-icons/ri';
 
 export const ChatButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -17,9 +18,9 @@ export const ChatButton = () => {
     <>
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-6 right-6 z-50 rounded-lg bg-green-500 px-6 py-3 text-white shadow-lg transition-all duration-300 ease-in-out hover:bg-green-600"
+        className="fixed bottom-6 right-6 z-50 flex items-center rounded-lg bg-[#5a889d] px-6 py-3 text-white shadow-lg transition-all duration-300 ease-in-out hover:bg-[#5a889d]/80"
       >
-        Чат з ботом
+        Чат з ботом <RiRobot2Line className="ml-2 inline-block" />
       </button>
       <ChatWindow
         isVisible={isVisible}

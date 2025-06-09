@@ -10,6 +10,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendChatMessage } from '@/services/api/chat';
+import { RiExpandUpDownLine } from 'react-icons/ri';
 
 interface ChatWindowProps {
   isVisible: boolean;
@@ -26,6 +27,8 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [includeExample, setIncludeExample] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
@@ -41,22 +44,22 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
   useEffect(() => {
     try {
       const savedMessages = sessionStorage.getItem(CHAT_STORAGE_KEY);
-      console.log('Загруженные сообщения:', savedMessages);
+      console.log('Завантажені повідомлення:', savedMessages);
 
       if (savedMessages) {
         const parsedMessages = JSON.parse(savedMessages);
-        console.log('Распарсенные сообщения:', parsedMessages);
+        console.log('Розпарсені повідомлення:', parsedMessages);
 
         if (Array.isArray(parsedMessages)) {
           setMessages(parsedMessages);
           checkMessagesLength(parsedMessages);
         } else {
-          console.error('Загруженные данные не являются массивом:', parsedMessages);
+          console.error('Завантажені дані не є масивом:', parsedMessages);
           sessionStorage.removeItem(CHAT_STORAGE_KEY);
         }
       }
     } catch (error) {
-      console.error('Ошибка при загрузке сообщений:', error);
+      console.error('Помилка при завантаженні повідомлень:', error);
       sessionStorage.removeItem(CHAT_STORAGE_KEY);
     }
   }, []);
@@ -64,11 +67,11 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
   useEffect(() => {
     try {
       if (messages.length > 0) {
-        console.log('Сохраняем сообщения:', messages);
+        console.log('Збереження повідомлень:', messages);
         sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
       }
     } catch (error) {
-      console.error('Ошибка при сохранении сообщений:', error);
+      console.error('Помилка при збереженні повідомлень:', error);
     }
   }, [messages]);
 
@@ -79,6 +82,23 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleScroll = () => {
+    const container = chatWindowRef.current?.querySelector('.overflow-y-auto');
+    if (container) {
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
+      setShowScrollButton(!isAtBottom);
+    }
+  };
+
+  useEffect(() => {
+    const container = chatWindowRef.current?.querySelector('.overflow-y-auto');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -100,7 +120,7 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
       const contextMessages = updatedMessages.slice(-MAX_CONTEXT_MESSAGES);
       const data = await sendChatMessage({
         messages: contextMessages.map(({ role, content }) => ({ role, content })),
-        include_example: false,
+        include_example: includeExample,
       });
 
       const raw = data.message;
@@ -145,14 +165,23 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
             isExpanded ? 'h-[600px] w-[800px]' : 'h-[500px] w-[350px]'
           } z-50 transition-all duration-300 ease-in-out`}
         >
-          <div className="flex items-center justify-between rounded-t-lg border-b bg-green-500 p-3 text-white">
+          <div className="flex items-center justify-between rounded-t-lg border-b bg-[#5a889d] p-3 text-white">
             <h2 className="text-base font-semibold">Чат з ботом</h2>
-            <button onClick={onClose} className="text-white hover:text-gray-200">
-              ✕
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="rounded p-1 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
+                aria-label={isExpanded ? 'Зменшити розмір' : 'Збільшити розмір'}
+              >
+                <RiExpandUpDownLine className="h-5 w-5" />
+              </button>
+              <button onClick={onClose} className="text-white hover:text-gray-200">
+                ✕
+              </button>
+            </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto p-3">
+          <div className="flex-1 space-y-3 overflow-y-auto p-3" onScroll={handleScroll}>
             {messages.map((message, index) => {
               const isInContext = index >= messages.length - MAX_CONTEXT_MESSAGES;
               return (
@@ -163,7 +192,7 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                   <div
                     className={`max-w-[85%] rounded-lg p-2 ${
                       message.role === 'user'
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-[#5a889d] text-white'
                         : 'bg-gray-100 text-gray-800'
                     } ${!isInContext ? 'opacity-50' : ''}`}
                     title={
@@ -302,7 +331,7 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                           href={message.example_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-green-600 hover:text-green-700 hover:underline"
+                          className="text-blue-600 hover:text-blue-700 hover:underline"
                         >
                           Приклад резюме
                         </a>
@@ -322,23 +351,63 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t p-3">
-            <div className="flex space-x-2">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Введіть повідомлення..."
-                className="flex-1 resize-none rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                rows={1}
-              />
-              <button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-                className="rounded-lg bg-green-500 px-3 py-2 text-sm text-white hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+          {showScrollButton && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={scrollToBottom}
+              className={`absolute right-4 rounded-full bg-[#5a889d] p-2 text-white shadow-lg hover:bg-[#5a889d]/80 focus:outline-none focus:ring-2 focus:ring-[#5a889d] focus:ring-offset-2 ${
+                isExpanded ? 'bottom-28' : 'bottom-32'
+              }`}
+              aria-label="Прокрутити вниз"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
               >
-                Відправити
-              </button>
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </motion.button>
+          )}
+
+          <div className="border-t p-3">
+            <div className="flex flex-col space-y-2">
+              <div className="flex space-x-2">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Введіть повідомлення..."
+                  className="flex-1 resize-none rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5a889d]"
+                  rows={1}
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={isLoading || !input.trim()}
+                  className="rounded-lg bg-[#5a889d] px-3 py-2 text-sm text-white hover:bg-[#5a889d]/80 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Відправити
+                </button>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="example-toggle"
+                  checked={includeExample}
+                  onChange={(e) => setIncludeExample(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-[#5a889d] focus:ring-[#5a889d]"
+                />
+                <label htmlFor="example-toggle" className="text-sm text-gray-600">
+                  Додати посилання на приклад резюме до відповіді
+                </label>
+              </div>
             </div>
           </div>
         </motion.div>
