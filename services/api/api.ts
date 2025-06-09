@@ -71,6 +71,44 @@ export async function post<T>(endpoint: string, data: any): Promise<T> {
   return response.json();
 }
 
+export async function postFile<T>(endpoint: string, data: any): Promise<T> {
+  const token = getAuthToken();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data),
+  });
+  let respData;
+  try {
+    respData = await response.clone().json();
+  } catch {}
+  if (!response.ok) {
+    throw handleApiError(response, respData);
+  }
+  return response.json();
+}
+
+export async function put<T>(endpoint: string, data: any): Promise<T> {
+  const token = getAuthToken();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify(data),
+  });
+  let respData;
+  try {
+    respData = await response.clone().json();
+  } catch {}
+  if (!response.ok) {
+    throw handleApiError(response, respData);
+  }
+  return response.json();
+}
+
 export async function getJobs(): Promise<JobPostBaseResponse[]> {
   return get<JobPostBaseResponse[]>('/jobs');
 }
@@ -149,4 +187,19 @@ export async function getJobPosts(params?: JobPostsParams): Promise<JobPostBaseR
   const endpoint = `/v1/job-posts${queryString ? `?${queryString}` : ''}`;
 
   return get<JobPostBaseResponse[]>(endpoint);
+}
+
+export async function getCurrentUserInfo(): Promise<any> {
+  const response = await get('/v1/seeker/profile');
+  return response;
+}
+
+export async function updateCurrentUserInfo(data: any): Promise<any> {
+  const response = await put('/v1/seeker/profile', data);
+  return response;
+}
+
+export async function updateCurrentUserCv(formData: FormData): Promise<string> {
+  const response = (await postFile('/v1/seeker/profile/cv', formData)) as string;
+  return response;
 }
