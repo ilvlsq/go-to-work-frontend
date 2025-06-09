@@ -3,9 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ProfileEditForm from './ProfileEditForm';
 import { useUser } from '@/context/UserContext';
-import { getCurrentUserInfo, updateCurrentUserInfo } from '@/services/api/api';
+import {
+  getAppliedJobs,
+  getCurrentUserInfo,
+  updateCurrentUserInfo,
+  getJob,
+} from '@/services/api/api';
 import type { SeekerProfile } from '@/types/seekerProfile';
 import Button from '../ui/Button';
+import UserResponsesCard from './UserResponsesCard';
+import type { UserResponse } from './UserResponsesCard';
+import { toSlug } from '@/utils/toSlug';
 
 export default function UserProfile() {
   const router = useRouter();
@@ -13,6 +21,21 @@ export default function UserProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<SeekerProfile | null>(null);
+  const [appliedJobs, setAppliedJobs] = useState<{
+    content: UserResponse[];
+    number: number;
+    totalPages: number;
+  }>({ content: [], number: 0, totalPages: 1 });
+  const [lastViewedJobId, setLastViewedJobId] = useState<number | null>(null);
+
+  const fetchAppliedJobs = async (page = 0) => {
+    const data = await getAppliedJobs();
+    setAppliedJobs({
+      content: data.content,
+      number: data.number,
+      totalPages: data.totalPages,
+    });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -22,8 +45,9 @@ export default function UserProfile() {
           router.push('/');
           return;
         }
-        const response = await getCurrentUserInfo();
-        setProfile(response.data);
+        const userInfo = await getCurrentUserInfo();
+        setProfile(userInfo.data);
+        await fetchAppliedJobs();
         setError(null);
       } catch (err) {
         setError('Не вдалося завантажити профіль');
@@ -50,6 +74,16 @@ export default function UserProfile() {
     router.push('/');
   };
 
+  const handlePageChange = (page: number) => {
+    fetchAppliedJobs();
+  };
+
+  const handleVacancyClick = (jobPostId: number, title: string) => {
+    setLastViewedJobId(jobPostId);
+    const vacancyUrl = `/vacancy/${toSlug(title)}-${jobPostId}`;
+    window.open(vacancyUrl, '_blank');
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
@@ -69,5 +103,28 @@ export default function UserProfile() {
     );
   }
 
-  return <ProfileEditForm profile={profile} onProfileUpdate={updateProfile} />;
+  return (
+    <div className="mx-auto mt-8 flex w-full max-w-5xl flex-col gap-8 md:flex-row">
+      <div className="flex-1">
+        <div className="rounded-xl bg-white p-2 shadow-md">
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={handleLogout} className="w-fit">
+              Вийти
+            </Button>
+          </div>
+          <ProfileEditForm profile={profile} onProfileUpdate={updateProfile} />
+        </div>
+      </div>
+      <div className="w-full flex-shrink-0 md:w-[420px]">
+        <UserResponsesCard
+          responses={appliedJobs.content}
+          page={appliedJobs.number}
+          totalPages={appliedJobs.totalPages}
+          onPageChange={handlePageChange}
+          onVacancyClick={handleVacancyClick}
+          lastViewedJobId={lastViewedJobId}
+        />
+      </div>
+    </div>
+  );
 }

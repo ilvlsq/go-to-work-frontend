@@ -1,6 +1,7 @@
 import { parseJobDescription } from '@/utils/vacancyDeatilsParse';
 import { FiMapPin, FiDollarSign, FiGlobe } from 'react-icons/fi';
 import { VacancyDetailsProps } from '@/types/types';
+import ApplyButton from './ApplyButton';
 
 interface Props {
   job: VacancyDetailsProps;
@@ -30,9 +31,7 @@ export default function VacancyDetails({ job }: Props) {
       {/* header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold leading-tight">{job.titleEn}</h1>
-        <button className="whitespace-nowrap rounded-full bg-[#e3f3f2] px-8 py-3 text-lg font-bold text-gray-700 shadow-md transition hover:bg-[#d0eae7] active:bg-[#F5FAFA]">
-          Відгукнутися
-        </button>
+        <ApplyButton jobId={job.id.toString()} />
       </div>
       {/* info */}
       <div className="flex flex-col gap-3 text-base text-gray-700">

@@ -209,3 +209,18 @@ export async function updateCurrentUserCv(formData: FormData): Promise<SeekerPro
   const response = (await postFile('/v1/seeker/profile/cv', formData)) as SeekerProfileCvResponse;
   return response;
 }
+
+export async function applyToJob(jobPostId: number): Promise<any> {
+  const response = await post('/v1/job-posts/apply', { jobPostId });
+  return response;
+}
+
+export async function hasAppliedToJob(jobPostId: number): Promise<any> {
+  const response = await get(`/v1/job-posts/${jobPostId}/has-applied`);
+  return response;
+}
+
+export async function getAppliedJobs(): Promise<any> {
+  const response = await get('/v1/job-posts/applied');
+  return response;
+}

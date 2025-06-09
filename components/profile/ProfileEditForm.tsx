@@ -270,7 +270,7 @@ export default function ProfileEditForm({ profile, onProfileUpdate }: ProfileEdi
 
   return (
     <form
-      className="mx-auto mt-8 flex max-w-2xl flex-col gap-8 rounded-xl bg-white p-8 shadow-md"
+      className="mx-auto flex max-w-2xl flex-col gap-8 rounded-xl bg-white p-8"
       onSubmit={handleSave}
     >
       <div className="flex items-center justify-between border-b pb-4">

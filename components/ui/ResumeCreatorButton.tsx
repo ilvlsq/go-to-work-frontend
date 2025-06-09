@@ -10,7 +10,7 @@ export default function ResumeCreatorButton() {
 
   const handleClick = () => {
     if (user) {
-      router.push('/dashboard');
+      router.push('/profile');
     } else {
       router.push('/auth/register');
     }

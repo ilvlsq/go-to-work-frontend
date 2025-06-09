@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile/
+
+Sitemap: http://35.180.134.138:3000/sitemap.xml 
