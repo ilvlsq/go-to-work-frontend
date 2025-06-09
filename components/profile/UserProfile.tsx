@@ -5,6 +5,7 @@ import ProfileEditForm from './ProfileEditForm';
 import { useUser } from '@/context/UserContext';
 import { getCurrentUserInfo, updateCurrentUserInfo } from '@/services/api/api';
 import type { SeekerProfile } from '@/types/seekerProfile';
+import Button from '../ui/Button';
 
 export default function UserProfile() {
   const router = useRouter();
@@ -59,8 +60,11 @@ export default function UserProfile() {
 
   if (error) {
     return (
-      <div className="flex h-96 items-center justify-center">
+      <div className="mx-auto flex h-96 w-full max-w-md flex-col items-center justify-center gap-4">
         <div className="text-lg text-red-600">{error}</div>
+        <Button variant="outline" onClick={handleLogout} className="w-full">
+          Вийти
+        </Button>
       </div>
     );
   }

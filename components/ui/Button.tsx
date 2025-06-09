@@ -21,7 +21,8 @@ export default function Button({
   const variantStyles = {
     primary: 'bg-white text-black hover:bg-gray-200 active:bg-gray-100',
     secondary: 'bg-secondary text-black hover:bg-secondaryDark active:bg-secondaryLight',
-    outline: 'bg-transparent text-primary border border-primary hover:bg-primary hover:text-white',
+    outline:
+      'bg-transparent text-primary border border-primary hover:bg-primary hover:text-black hover:bg-secondary active:bg-secondaryLight',
   };
 
   const sizeStyles = {
