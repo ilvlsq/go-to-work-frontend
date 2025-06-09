@@ -44,3 +44,9 @@ export interface SeekerProfileResponse {
   message: string;
   data?: SeekerProfile;
 }
+
+export interface SeekerProfileCvResponse {
+  success: boolean;
+  message: string;
+  data: { cvUrl: string };
+}
