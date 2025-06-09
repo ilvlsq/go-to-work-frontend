@@ -22,9 +22,16 @@ const CHAT_STORAGE_KEY = 'chat_messages';
 const MAX_CONTEXT_MESSAGES = 6;
 const LONG_MESSAGE_THRESHOLD = 450;
 
-const cleanUnformattedAsterisks = (content: string) => {
-  // Заменяем одиночные звездочки, которые не являются частью форматирования
-  return content.replace(/(?<!\*)\*(?!\*)/g, '');
+const formatServerResponse = (response: string): string => {
+  const userReplaced = response.replace(/Користувач:/g, 'Приклад вашої відповіді:');
+
+  const assistantIndex = userReplaced.indexOf('Асистент:');
+
+  if (assistantIndex !== -1) {
+    return userReplaced.slice(0, assistantIndex).trim();
+  }
+
+  return userReplaced.trim();
 };
 
 export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindowProps) => {
@@ -128,7 +135,9 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
         include_example: includeExample,
       });
 
-      const raw = data.message;
+      console.log('data', data.message);
+      const raw = formatServerResponse(data.message);
+      console.log('raw', raw);
       const exampleUrl = data.example_url;
 
       if (raw.length > LONG_MESSAGE_THRESHOLD) {
@@ -156,6 +165,10 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const removeStars = (content: string) => {
+    return content.replace(/\*/g, '');
   };
 
   return (
@@ -205,133 +218,55 @@ export const ChatWindow = ({ isVisible, onClose, onProcessingChange }: ChatWindo
                     }
                   >
                     <ReactMarkdown
-                      remarkPlugins={[remarkGfm, remarkParse, remarkBreaks]}
-                      rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                      remarkPlugins={[remarkGfm]}
                       components={{
-                        code({ node, inline, className, children, ...props }: any) {
-                          const content = Array.isArray(children)
-                            ? children.join('')
-                            : String(children);
-                          return (
-                            <code
-                              className={`${className} ${
-                                inline
-                                  ? 'rounded bg-gray-200 px-1 py-0.5'
-                                  : 'my-2 block rounded-lg bg-gray-100 p-4'
-                              }`}
-                              {...props}
-                            >
-                              {content}
-                            </code>
-                          );
-                        },
-                        pre({ node, children, ...props }) {
-                          return (
-                            <pre
-                              className="my-2 overflow-x-auto rounded-lg bg-gray-100 p-4"
-                              {...props}
-                            >
-                              {children}
-                            </pre>
-                          );
-                        },
-                        table({ node, children, ...props }) {
-                          return (
-                            <div className="my-4 overflow-x-auto">
-                              <table className="min-w-full divide-y divide-gray-200" {...props}>
-                                {children}
-                              </table>
-                            </div>
-                          );
-                        },
-                        th({ node, children, ...props }) {
-                          return (
-                            <th
-                              className="bg-gray-50 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                              {...props}
-                            >
-                              {children}
-                            </th>
-                          );
-                        },
-                        td({ node, children, ...props }) {
-                          return (
-                            <td
-                              className="whitespace-nowrap px-6 py-4 text-sm text-gray-500"
-                              {...props}
-                            >
-                              {children}
-                            </td>
-                          );
-                        },
-                        strong({ node, children, ...props }) {
-                          return (
-                            <strong className="font-bold" {...props}>
-                              {children}
-                            </strong>
-                          );
-                        },
-                        em({ node, children, ...props }) {
-                          return (
-                            <em className="italic" {...props}>
-                              {children}
-                            </em>
-                          );
-                        },
-                        p({ node, children, ...props }) {
-                          const content = Array.isArray(children)
-                            ? children.join('')
-                            : String(children);
-                          return (
-                            <p className="mb-2" {...props}>
-                              {cleanUnformattedAsterisks(content)}
-                            </p>
-                          );
-                        },
-                        ul({ node, children, ...props }) {
-                          return (
-                            <ul className="mb-2 list-disc pl-5" {...props}>
-                              {children}
-                            </ul>
-                          );
-                        },
-                        ol({ node, children, ...props }) {
-                          return (
-                            <ol className="mb-2 list-decimal pl-5" {...props}>
-                              {children}
-                            </ol>
-                          );
-                        },
-                        li({ node, children, ...props }) {
-                          return (
-                            <li className="mb-1" {...props}>
-                              {children}
-                            </li>
-                          );
-                        },
-                        blockquote({ node, children, ...props }) {
-                          return (
-                            <blockquote
-                              className="my-2 border-l-4 border-gray-300 pl-4 italic"
-                              {...props}
-                            >
-                              {children}
-                            </blockquote>
-                          );
-                        },
-                        a({ node, children, href, ...props }) {
-                          return (
-                            <a
-                              href={href}
-                              className="text-green-600 hover:text-green-700 hover:underline"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              {...props}
-                            >
-                              {children}
-                            </a>
-                          );
-                        },
+                        a: ({ node, children, href, ...props }) => (
+                          <a
+                            href={href}
+                            className="text-blue-600 hover:text-blue-700 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            {...props}
+                          >
+                            {children}
+                          </a>
+                        ),
+                        p: ({ node, children, ...props }) => (
+                          <p className="mb-2" {...props}>
+                            {typeof children === 'string' ? removeStars(children) : children}
+                          </p>
+                        ),
+                        ul: ({ node, children, ...props }) => (
+                          <ul className="mb-2 list-disc pl-5" {...props}>
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ node, children, ...props }) => (
+                          <ol className="mb-2 list-decimal pl-5" {...props}>
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ node, children, ...props }) => (
+                          <li className="mb-1" {...props}>
+                            {children}
+                          </li>
+                        ),
+                        code: ({ node, className, children, ...props }) => (
+                          <code
+                            className={`${className} ${'rounded bg-gray-200 px-1 py-0.5'}`}
+                            {...props}
+                          >
+                            {children}
+                          </code>
+                        ),
+                        pre: ({ node, children, ...props }) => (
+                          <pre
+                            className="my-2 overflow-x-auto rounded-lg bg-gray-100 p-4"
+                            {...props}
+                          >
+                            {children}
+                          </pre>
+                        ),
                       }}
                     >
                       {message.content}
