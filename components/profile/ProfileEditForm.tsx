@@ -102,7 +102,7 @@ export default function ProfileEditForm({ profile, onProfileUpdate }: ProfileEdi
         const cvUrl = await updateCurrentUserCv(formData);
         console.log('CV upload response:', cvUrl);
         if (cvUrl) {
-          setForm((prev: any) => ({ ...prev, cvUrl: cvUrl }));
+          setForm((prev: any) => ({ ...prev, cvUrl: cvUrl.data.cvUrl }));
         } else {
           setCvError('Не вдалося отримати посилання на файл');
         }
@@ -584,14 +584,13 @@ export default function ProfileEditForm({ profile, onProfileUpdate }: ProfileEdi
         <div className="flex flex-col gap-2">
           {form.cvUrl && (
             <div className="mb-2 block text-sm font-medium">
-              Посилання на ваше поточне резюме
               <a
                 href={form.cvUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
               >
-                {form.cvUrl}
+                Посилання на ваше поточне резюме
               </a>
             </div>
           )}

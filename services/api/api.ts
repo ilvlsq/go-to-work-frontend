@@ -1,3 +1,4 @@
+import { SeekerProfileCvResponse } from '@/types/seekerProfile';
 import { Company, JobPostBaseResponse, JobPostsParams, RecommendetJobsType } from '@/types/types';
 import { getAuthToken, clearAuthData } from '@/utils/auth';
 
@@ -71,22 +72,27 @@ export async function post<T>(endpoint: string, data: any): Promise<T> {
   return response.json();
 }
 
-export async function postFile<T>(endpoint: string, data: any): Promise<T> {
+export async function postFile<T>(endpoint: string, data: FormData): Promise<T> {
   const token = getAuthToken();
-  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+
+  const headers: HeadersInit = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: 'POST',
-    headers,
-    body: JSON.stringify(data),
+    headers, // ⚠️ НЕ указываем Content-Type!
+    body: data,
   });
+
   let respData;
   try {
     respData = await response.clone().json();
   } catch {}
+
   if (!response.ok) {
     throw handleApiError(response, respData);
   }
+
   return response.json();
 }
 
@@ -199,7 +205,7 @@ export async function updateCurrentUserInfo(data: any): Promise<any> {
   return response;
 }
 
-export async function updateCurrentUserCv(formData: FormData): Promise<string> {
-  const response = (await postFile('/v1/seeker/profile/cv', formData)) as string;
+export async function updateCurrentUserCv(formData: FormData): Promise<SeekerProfileCvResponse> {
+  const response = (await postFile('/v1/seeker/profile/cv', formData)) as SeekerProfileCvResponse;
   return response;
 }
