@@ -26,14 +26,14 @@ function formatDate(date: string) {
   });
 }
 
-const UserResponsesCard: React.FC<UserResponsesCardProps> = ({
+export default function UserResponsesCard({
   responses,
   page,
   totalPages,
   onPageChange,
   onVacancyClick,
   lastViewedJobId,
-}) => {
+}: UserResponsesCardProps) {
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-xl">
       <h2 className="rounded-t-2xl bg-[#e3f3f2] px-8 py-3 text-center text-sm font-semibold uppercase tracking-wide text-[#7b7b7b]">
@@ -120,6 +120,4 @@ const UserResponsesCard: React.FC<UserResponsesCardProps> = ({
       )}
     </div>
   );
-};
-
-export default UserResponsesCard;
+}

@@ -163,10 +163,33 @@ export interface VacancyDetailsProps {
 export interface SimilarJobCardProps {
   id: number;
   title: string;
-  titleEn?: string;
-  jobLocation?: string;
-  jobType?: { name: string };
-  jobDescription?: string;
+  titleEn: string;
+  description: string;
+  descriptionEn: string;
+  location: string;
+  salaryRange: string;
+  employmentType: string;
+  experienceLevel: string;
+  requiredExperience: {
+    id: number;
+    experience: string;
+  }[];
+  tags: {
+    id: number;
+    name: string;
+  }[];
+  skills: {
+    id: number;
+    name: string;
+    level: number | null;
+  };
+}
+
+export interface SimilarJobCardResponse {
+  jobs: SimilarJobCardProps[];
+  page: number;
+  size: number;
+  total: number;
 }
 
 export interface RecentVacancies {

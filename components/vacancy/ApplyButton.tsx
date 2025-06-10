@@ -6,6 +6,7 @@ import { applyToJob, hasAppliedToJob } from '@/services/api/api';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import { getAuthToken } from '@/utils/auth';
+import { BsCheck2 } from 'react-icons/bs';
 
 interface ApplyButtonProps {
   jobId: string;
@@ -58,8 +59,10 @@ export default function ApplyButton({ jobId, initialApplied = false }: ApplyButt
       size="medium"
       onClick={handleApply}
       disabled={isApplied || isLoading}
+      className="flex items-center justify-center gap-2"
     >
       {isLoading ? 'Завантаження...' : isApplied ? 'Відгукнувся' : 'Відгукнутися'}
+      {isApplied && <BsCheck2 />}
     </Button>
   );
 }

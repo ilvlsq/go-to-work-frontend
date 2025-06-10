@@ -1,5 +1,12 @@
 import { SeekerProfileCvResponse } from '@/types/seekerProfile';
-import { Company, JobPostBaseResponse, JobPostsParams, RecommendetJobsType } from '@/types/types';
+import {
+  Company,
+  JobPostBaseResponse,
+  JobPostsParams,
+  RecommendetJobsType,
+  SimilarJobCardProps,
+  SimilarJobCardResponse,
+} from '@/types/types';
 import { getAuthToken, clearAuthData } from '@/utils/auth';
 
 const API_BASE_URL = 'http://35.180.134.138:8082/api';
@@ -123,8 +130,8 @@ export async function getJob(id: string): Promise<JobPostBaseResponse | null> {
   return get<JobPostBaseResponse>(`/v1/job-posts/${id}`);
 }
 
-export async function getSimilarJobs(id: string): Promise<JobPostBaseResponse[]> {
-  return get(`/jobs/${id}/similar`);
+export async function getSimilarJobs(id: string): Promise<SimilarJobCardResponse[]> {
+  return get(`/v1/recommendations/for-job/${id}`);
 }
 
 export async function getCompanies(params?: {
@@ -220,7 +227,16 @@ export async function hasAppliedToJob(jobPostId: number): Promise<any> {
   return response;
 }
 
-export async function getAppliedJobs(): Promise<any> {
-  const response = await get('/v1/job-posts/applied');
-  return response;
+export async function getAppliedJobs(params?: { page?: number; size?: number }): Promise<any> {
+  const queryParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
+      }
+    });
+  }
+  const queryString = queryParams.toString();
+  const endpoint = `/v1/job-posts/applied${queryString ? `?${queryString}` : ''}`;
+  return get(endpoint);
 }

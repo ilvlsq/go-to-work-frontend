@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getJob } from '@/services/api/api';
+import { getJob, getSimilarJobs } from '@/services/api/api';
 import VacancyDetails from '@/components/vacancy/VacancyDetails';
 import { notFound } from 'next/navigation';
 import CompanyCard from '@/components/vacancy/CompanyCard';
@@ -53,18 +53,14 @@ export default async function VacancyPage({ params }: Props) {
   const { id } = parseSlugAndId(params.slugAndId);
   const job = await getJob(id);
   if (!job) return notFound();
-  const similarJobs = [
-    { id: 1, title: 'title', description: 'description' },
-    { id: 2, title: 'title', description: 'description' },
-    { id: 3, title: 'title', description: 'description' },
-  ];
+  const similarJobs = await getSimilarJobs(id);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 py-8 lg:flex-row">
       <VacancyDetails job={job as unknown as VacancyDetailsProps} />
       <div className="flex h-fit w-full flex-col gap-6 lg:sticky lg:top-20 lg:w-[400px]">
         <CompanyCard company={job.company} />
-        <SimilarJobs jobs={similarJobs} />
+        <SimilarJobs recommendedJobs={similarJobs.jobs} />
       </div>
     </div>
   );

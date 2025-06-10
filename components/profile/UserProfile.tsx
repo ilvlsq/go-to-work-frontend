@@ -3,12 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ProfileEditForm from './ProfileEditForm';
 import { useUser } from '@/context/UserContext';
-import {
-  getAppliedJobs,
-  getCurrentUserInfo,
-  updateCurrentUserInfo,
-  getJob,
-} from '@/services/api/api';
+import { getAppliedJobs, getCurrentUserInfo, updateCurrentUserInfo } from '@/services/api/api';
 import type { SeekerProfile } from '@/types/seekerProfile';
 import Button from '../ui/Button';
 import UserResponsesCard from './UserResponsesCard';
@@ -29,9 +24,9 @@ export default function UserProfile() {
   const [lastViewedJobId, setLastViewedJobId] = useState<number | null>(null);
 
   const fetchAppliedJobs = async (page = 0) => {
-    const data = await getAppliedJobs();
+    const data = await getAppliedJobs({ page, size: 10 });
     setAppliedJobs({
-      content: data.content,
+      content: data.content.reverse(),
       number: data.number,
       totalPages: data.totalPages,
     });
@@ -47,7 +42,7 @@ export default function UserProfile() {
         }
         const userInfo = await getCurrentUserInfo();
         setProfile(userInfo.data);
-        await fetchAppliedJobs();
+        await fetchAppliedJobs(0);
         setError(null);
       } catch (err) {
         setError('Не вдалося завантажити профіль');
@@ -58,6 +53,14 @@ export default function UserProfile() {
     };
     fetchProfile();
   }, [router]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchAppliedJobs(appliedJobs.number);
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [appliedJobs.number]);
 
   const updateProfile = async (updatedProfile: SeekerProfile) => {
     try {
@@ -75,7 +78,7 @@ export default function UserProfile() {
   };
 
   const handlePageChange = (page: number) => {
-    fetchAppliedJobs();
+    fetchAppliedJobs(page);
   };
 
   const handleVacancyClick = (jobPostId: number, title: string) => {

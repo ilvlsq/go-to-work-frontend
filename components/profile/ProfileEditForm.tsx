@@ -624,18 +624,6 @@ export default function ProfileEditForm({ profile, onProfileUpdate }: ProfileEdi
             />
             {cvUploading && <div className="mt-2 text-xs text-blue-500">Завантаження...</div>}
             {cvError && <div className="mt-2 text-xs text-red-500">{cvError}</div>}
-            {typeof form === 'object' && form && form.cvUrl && !cvUploading && (
-              <div className="mt-2 text-xs text-green-600">
-                <a
-                  href={form.cvUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  Переглянути CV
-                </a>
-              </div>
-            )}
             {cvFile && !cvUploading && !(typeof form === 'object' && form && form.cvUrl) && (
               <div className="mt-2 text-xs text-gray-600">Вибрано файл: {cvFile.name}</div>
             )}
