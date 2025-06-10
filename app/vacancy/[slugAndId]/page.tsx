@@ -60,6 +60,7 @@ export default async function VacancyPage({ params }: Props) {
       <VacancyDetails job={job as unknown as VacancyDetailsProps} />
       <div className="flex h-fit w-full flex-col gap-6 lg:sticky lg:top-20 lg:w-[400px]">
         <CompanyCard company={job.company} />
+        {/* @ts-ignore */}
         <SimilarJobs recommendedJobs={similarJobs.jobs} />
       </div>
     </div>
